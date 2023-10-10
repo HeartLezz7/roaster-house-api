@@ -6,6 +6,101 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int            @id @default(autoincrement())
+  firstName    String?
+  lastName     String?
+  username     String         @unique
+  password     String
+  email        String?        @unique
+  phone        String?        @unique
+  address      Address[]
+  shoppingCart ShoppingCart[]
+  order        Order[]
+}
+
+enum roastLevel {
+  light
+  medium
+  medium_dark
+  dark
+}
+
+model Product {
+  id           Int            @id @default(autoincrement())
+  productName  String         @map("product_name")
+  productImage String         @map("product_image")
+  roastLevel   roastLevel     @map("roast_level")
+  description  String
+  price        Decimal        @db.Decimal(10, 2)
+  amount       Int
+  shoppingCart ShoppingCart[]
+  orderItem    OrderItem[]
+}
+
+model Address {
+  id          Int    @id @default(autoincrement())
+  addressInfo String @map("address")
+  subDistrict String @map("sub_district")
+  district    String
+  province    String
+  postcode    String
+  userId      Int
+  user        User   @relation(fields: [userId], references: [id])
+}
+
+model ShoppingCart {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  user      User    @relation(fields: [userId], references: [id])
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  amount    Int
+
+  @@map("shopping_cart")
+}
+
+model OrderItem {
+  id         Int     @id @default(autoincrement())
+  amount     Int
+  totalPrice Decimal @map("total_price") @db.Decimal(10, 2)
+  productId  Int
+  product    Product @relation(fields: [productId], references: [id])
+  orderId    Int
+  order      Order   @relation(fields: [orderId], references: [id])
+
+  @@map("order_item")
+}
+
+enum orderStatus {
+  pending
+  shipping
+  completed
+  cancel
+}
+
+model Order {
+  id          Int           @id @default(autoincrement())
+  sumPrice    Decimal       @db.Decimal(10, 2)
+  createdAt   DateTime      @default(now())
+  status      orderStatus
+  userId      Int
+  user        User          @relation(fields: [userId], references: [id])
+  orderItem   OrderItem[]
+  transaction Transaction[]
+}
+
+model Transaction {
+  id         Int      @id @default(autoincrement())
+  slip       String?
+  creditCard String?
+  payment    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+  orderId    Int
+  order      Order    @relation(fields: [orderId], references: [id])
 }

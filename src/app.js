@@ -5,7 +5,8 @@ const cors = require("cors");
 
 app.use(express.json());
 app.use(cors());
-console.log("first");
+
+app.use("/", (req, res, next) => res.json({ message: "Hello" }));
 
 PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server run on port ${PORT}`));
