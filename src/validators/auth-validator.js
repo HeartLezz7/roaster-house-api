@@ -3,9 +3,12 @@ const Joi = require("joi");
 const registerSchema = Joi.object({
   firstName: Joi.string().trim().required(),
   lastName: Joi.string().trim().required(),
-  username: Joi.string().trim().required(),
+  username: Joi.string()
+    .trim()
+    .pattern(/^[a-zA-Z0-9]{6,30}$/)
+    .required(),
   password: Joi.string()
-    .pattern(/^[a-zA-z0-9]{6,30}$/)
+    .pattern(/^[a-zA-Z0-9]{6,30}$/)
     .trim()
     .required(),
   confirmPassword: Joi.string()
@@ -16,4 +19,30 @@ const registerSchema = Joi.object({
   email: Joi.string().trim().required(),
   phone: Joi.string().trim().required(),
 });
-exports.registerSchema = registerSchema;
+
+const loginSchema = Joi.object({
+  emailOrUsername: Joi.alternatives([
+    Joi.string().email({ tlds: { allow: ["com"] } }),
+    Joi.string()
+      .trim()
+      .pattern(/^[a-zA-Z0-9]{6,30}$/),
+  ])
+    .required()
+    .strip(),
+  password: Joi.string()
+    .pattern(/^[a-zA-Z0-9]{6,30}$/)
+    .trim()
+    .required(),
+  username: Joi.forbidden().when("emailOrUsername", {
+    is: Joi.string()
+      .trim()
+      .pattern(/^[a-zA-Z0-9]{6,30}$/),
+    then: Joi.string().trim().default(Joi.ref("emailOrUsername")),
+  }),
+  email: Joi.forbidden().when("emailOrUsername", {
+    is: Joi.string().email({ tlds: { allow: ["com"] } }),
+    then: Joi.string().default(Joi.ref("emailOrUsername")),
+  }),
+});
+
+module.exports = { registerSchema, loginSchema };
