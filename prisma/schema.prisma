@@ -11,15 +11,15 @@ datasource db {
 }
 
 model User {
-  id           Int            @id @default(autoincrement())
-  firstName    String?
-  lastName     String?
-  username     String         @unique
+  id           Int           @id @default(autoincrement())
+  firstName    String
+  lastName     String
+  username     String        @unique
   password     String
-  email        String?        @unique
-  phone        String?        @unique
+  email        String        @unique
+  phone        String        @unique
   address      Address[]
-  shoppingCart ShoppingCart[]
+  shoppingCart ShoppingCart?
   order        Order[]
 }
 
@@ -55,7 +55,7 @@ model Address {
 
 model ShoppingCart {
   id        Int     @id @default(autoincrement())
-  userId    Int
+  userId    Int     @unique
   user      User    @relation(fields: [userId], references: [id])
   productId Int
   product   Product @relation(fields: [productId], references: [id])
@@ -84,14 +84,14 @@ enum orderStatus {
 }
 
 model Order {
-  id          Int           @id @default(autoincrement())
-  sumPrice    Decimal       @db.Decimal(10, 2)
-  createdAt   DateTime      @default(now())
+  id          Int          @id @default(autoincrement())
+  sumPrice    Decimal      @db.Decimal(10, 2)
+  createdAt   DateTime     @default(now())
   status      orderStatus
   userId      Int
-  user        User          @relation(fields: [userId], references: [id])
+  user        User         @relation(fields: [userId], references: [id])
   orderItem   OrderItem[]
-  transaction Transaction[]
+  transaction Transaction?
 }
 
 model Transaction {
@@ -101,6 +101,6 @@ model Transaction {
   payment    String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now())
-  orderId    Int
+  orderId    Int      @unique
   order      Order    @relation(fields: [orderId], references: [id])
 }
