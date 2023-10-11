@@ -16,13 +16,18 @@ const registerSchema = Joi.object({
     .trim()
     .required()
     .strip(),
-  email: Joi.string().trim().required(),
+  email: Joi.string()
+    .pattern(/@(gmail|hotmail)\.com$/)
+    .trim()
+    .required(),
   phone: Joi.string().trim().required(),
 });
 
 const loginSchema = Joi.object({
   emailOrUsername: Joi.alternatives([
-    Joi.string().email({ tlds: { allow: ["com"] } }),
+    Joi.string()
+      .pattern(/@(gmail|hotmail)\.com$/)
+      .email({ tlds: { allow: ["com"] } }),
     Joi.string()
       .trim()
       .pattern(/^[a-zA-Z0-9]{6,30}$/),
@@ -40,7 +45,9 @@ const loginSchema = Joi.object({
     then: Joi.string().trim().default(Joi.ref("emailOrUsername")),
   }),
   email: Joi.forbidden().when("emailOrUsername", {
-    is: Joi.string().email({ tlds: { allow: ["com"] } }),
+    is: Joi.string()
+      .pattern(/@(gmail|hotmail)\.com$/)
+      .email({ tlds: { allow: ["com"] } }),
     then: Joi.string().default(Joi.ref("emailOrUsername")),
   }),
 });

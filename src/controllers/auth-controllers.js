@@ -3,18 +3,12 @@ const jwt = require("jsonwebtoken");
 const prisma = require("../models/prisma");
 const { registerSchema, loginSchema } = require("../validators/auth-validator");
 
-const validator = require("../validators/validateShcema");
-const { object } = require("joi");
+const validator = require("../validators/validate-shcema");
+const createError = require("../utils/create-error");
 
 exports.register = async (req, res, next) => {
   try {
     const value = validator(registerSchema, req.body, 400);
-    const isGmail = value.email.includes("gmail");
-    const isHotmail = value.email.includes("hotmail");
-
-    if (!isGmail && !isHotmail) {
-      return res.status(404).json({ message: "invalid email" });
-    }
 
     value.password = await bcrypt.hash(value.password, 12);
     console.log(value.password);
@@ -34,11 +28,11 @@ exports.login = async (req, res, next) => {
       },
     });
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return next(createError("user not found", 400));
     }
     const isPassword = bcrypt.compare(value.password, user.password);
     if (!isPassword) {
-      return res.status(404).json({ message: "User not found" });
+      return next(createError("user not found", 400));
     }
 
     const payload = { userId: user.id };
@@ -49,12 +43,8 @@ exports.login = async (req, res, next) => {
         expiresIn: process.env.JWT_EXPIRE,
       }
     );
-    const userData = Object.assign({
-      firstName: user.firstName,
-      lastName: user.lastName,
-    });
 
-    res.json({ message: "login SUCCESS", userData, accessToken });
+    res.json({ message: "login SUCCESS", user, accessToken });
   } catch (err) {
     next(err);
   }
