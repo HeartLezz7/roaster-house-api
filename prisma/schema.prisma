@@ -10,11 +10,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  admin
+  user
+}
+
 model User {
   id           Int           @id @default(autoincrement())
   firstName    String
   lastName     String
   username     String        @unique
+  role         Role          @default(user)
   password     String
   email        String        @unique
   phone        String        @unique
@@ -23,19 +29,30 @@ model User {
   order        Order[]
 }
 
-enum roastLevel {
+enum RoastLevel {
   light
   medium
   medium_dark
   dark
 }
 
+enum Process {
+  natural
+  wash
+  honey
+  dry
+  wet
+}
+
 model Product {
   id           Int            @id @default(autoincrement())
   productName  String         @map("product_name")
   productImage String         @map("product_image")
-  roastLevel   roastLevel     @map("roast_level")
-  description  String
+  tasingNote   String         @map("tasing_note")
+  origin       String
+  process      Process
+  roastLevel   RoastLevel     @map("roast_level")
+  size         Int
   price        Decimal        @db.Decimal(10, 2)
   amount       Int
   shoppingCart ShoppingCart[]
