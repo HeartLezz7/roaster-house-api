@@ -43,6 +43,7 @@ exports.login = async (req, res, next) => {
         expiresIn: process.env.JWT_EXPIRE,
       }
     );
+    delete user.password;
 
     res.json({ message: "login SUCCESS", user, accessToken });
   } catch (err) {

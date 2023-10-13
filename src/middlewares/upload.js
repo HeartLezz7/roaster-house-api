@@ -1,18 +1,22 @@
 const multer = require("multer");
 
+const getDate = new Date().toLocaleString().split(", ");
+const date = getDate[0].split("/");
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "public");
   },
   filename: (req, file, cb) => {
-    const splitName = file.originalname.split(".");
+    const split = file.originalname.split(".");
     cb(
       null,
       "" +
-        Date.now() +
-        Math.random * 100000 +
+        date.join("") +
+        "_" +
+        Math.round(Math.random() * 1000000) +
         "." +
-        splitName[splitName.length - 1]
+        split[split.length - 1]
     );
   },
 });
