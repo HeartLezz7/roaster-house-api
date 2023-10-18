@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 module.exports = async (req, res, next) => {
   try {
     const authorization = req.headers.authorization;
+    console.log(authorization);
     if (!authorization || !authorization.startsWith("Bearer ")) {
       return next(createError("Access denined", 401));
     }
@@ -24,6 +25,7 @@ module.exports = async (req, res, next) => {
     }
     delete user.password;
     req.user = user;
+    next();
   } catch (err) {
     if (err.name === "tokenExpiredError" || "JsonWebTokenError") {
       err.statusCode = 401;

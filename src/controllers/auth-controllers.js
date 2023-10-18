@@ -1,7 +1,12 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const prisma = require("../models/prisma");
-const { registerSchema, loginSchema } = require("../validators/auth-validator");
+const {
+  registerSchema,
+  loginSchema,
+  adminLoginSchema,
+  adminRegisterSchema,
+} = require("../validators/auth-validator");
 
 const validator = require("../validators/validate-shcema");
 const createError = require("../utils/create-error");
@@ -33,7 +38,7 @@ exports.login = async (req, res, next) => {
       return next(createError("user not found", 400));
     }
 
-    const payload = { userId: user.id };
+    const payload = { userId: user.id, role: user.role };
     const accessToken = jwt.sign(
       payload,
       process.env.JWT_SECRET_KEY || "1q2w3e4r5t6y7u8i9o0p",
@@ -63,7 +68,7 @@ exports.adminRegister = async (req, res, next) => {
 
 exports.adminLogin = async (req, res, next) => {
   try {
-    const value = validator(loginSchema, req.body, 400);
+    const value = validator(adminLoginSchema, req.body, 400);
     const admin = await prisma.user.findFirst({
       where: {
         AND: [
@@ -91,6 +96,19 @@ exports.adminLogin = async (req, res, next) => {
     delete admin.password;
 
     res.json({ message: "login SUCCESS", admin, payload, accessToken });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getUser = async (req, res, next) => {
+  try {
+    if (req.user.role == "user") {
+      return res.status(200).json({ message: "Access allow", user: req.user });
+    }
+    if (req.user.role == "admin") {
+      return res.status(200).json({ message: "Access allow", admin: req.user });
+    }
   } catch (err) {
     next(err);
   }

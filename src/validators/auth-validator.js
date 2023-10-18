@@ -52,4 +52,69 @@ const loginSchema = Joi.object({
   }),
 });
 
-module.exports = { registerSchema, loginSchema };
+const adminLoginSchema = Joi.object({
+  emailOrUsername: Joi.alternatives([
+    Joi.string()
+      .pattern(/@(gmail|hotmail)\.com$/)
+      .email({ tlds: { allow: ["com"] } }),
+    Joi.string()
+      .trim()
+      .pattern(/^[a-zA-Z0-9]{6,30}$/),
+  ])
+    .required()
+    .strip(),
+  password: Joi.string()
+    .pattern(/^[a-zA-Z0-9]{6,30}$/)
+    .trim()
+    .required(),
+  username: Joi.forbidden().when("emailOrUsername", {
+    is: Joi.string()
+      .trim()
+      .pattern(/^[a-zA-Z0-9]{6,30}$/),
+    then: Joi.string().trim().default(Joi.ref("emailOrUsername")),
+  }),
+  email: Joi.forbidden().when("emailOrUsername", {
+    is: Joi.string()
+      .pattern(/@(gmail|hotmail)\.com$/)
+      .email({ tlds: { allow: ["com"] } }),
+    then: Joi.string().default(Joi.ref("emailOrUsername")),
+  }),
+  role: Joi.string().trim().required(),
+});
+
+const adminRegisterSchema = Joi.object({
+  emailOrUsername: Joi.alternatives([
+    Joi.string()
+      .pattern(/@(gmail|hotmail)\.com$/)
+      .email({ tlds: { allow: ["com"] } }),
+    Joi.string()
+      .trim()
+      .pattern(/^[a-zA-Z0-9]{6,30}$/),
+  ])
+    .required()
+    .strip(),
+  password: Joi.string()
+    .pattern(/^[a-zA-Z0-9]{6,30}$/)
+    .trim()
+    .required(),
+  username: Joi.forbidden().when("emailOrUsername", {
+    is: Joi.string()
+      .trim()
+      .pattern(/^[a-zA-Z0-9]{6,30}$/),
+    then: Joi.string().trim().default(Joi.ref("emailOrUsername")),
+  }),
+  email: Joi.forbidden().when("emailOrUsername", {
+    is: Joi.string()
+      .pattern(/@(gmail|hotmail)\.com$/)
+      .email({ tlds: { allow: ["com"] } }),
+    then: Joi.string().default(Joi.ref("emailOrUsername")),
+  }),
+  role: Joi.string().trim().required(),
+});
+
+module.exports = {
+  registerSchema,
+  loginSchema,
+  adminLoginSchema,
+  adminRegisterSchema,
+};

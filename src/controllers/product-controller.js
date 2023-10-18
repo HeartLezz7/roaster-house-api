@@ -38,3 +38,16 @@ exports.getProducts = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.findProduct = async (req, res, next) => {
+  try {
+    console.log(req.params);
+    const { productId } = req.params;
+    const product = await prisma.product.findFirst({
+      where: { id: +productId },
+    });
+    res.status(200).json({ product });
+  } catch (err) {
+    next(err);
+  }
+};
