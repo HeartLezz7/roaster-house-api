@@ -41,7 +41,6 @@ exports.getProducts = async (req, res, next) => {
 
 exports.findProduct = async (req, res, next) => {
   try {
-    console.log(req.params);
     const { productId } = req.params;
     const product = await prisma.product.findFirst({
       where: { id: +productId },

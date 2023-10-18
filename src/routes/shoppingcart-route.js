@@ -9,4 +9,15 @@ router.post(
   shoppingCartController.modifyShoppingCart
 );
 
+router.get(
+  "/get",
+  authenticateMiddleware,
+  shoppingCartController.getShoppingCart
+);
+router.delete(
+  "/:deleteId",
+  authenticateMiddleware,
+  shoppingCartController.deleteShoppingCart
+);
+
 module.exports = router;
