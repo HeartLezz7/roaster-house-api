@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken");
 module.exports = async (req, res, next) => {
   try {
     const authorization = req.headers.authorization;
-    console.log(authorization);
     if (!authorization || !authorization.startsWith("Bearer ")) {
       return next(createError("Access denined", 401));
     }

@@ -1,33 +1,4 @@
-const { cloudinary_js_config } = require("../configs/cloudinary");
 const prisma = require("../models/prisma");
-
-exports.modifyShoppingCart = async (req, res, next) => {
-  try {
-    const { id, productId, amount } = req.body;
-    const findProduct = await prisma.shoppingCarts.findFirst({
-      where: { productId },
-    });
-    if (!findProduct) {
-      const productCart = {
-        userId: req.user.id,
-        productId,
-        amount,
-      };
-      const createShoppingCart = await prisma.shoppingCarts.create({
-        data: productCart,
-      });
-      res.status(201).json({ message: "CREATED", createShoppingCart });
-    } else {
-      const updateShoppingCart = await prisma.shoppingCarts.update({
-        where: { id },
-        data: { amount: +amount },
-      });
-      res.status(200).json({ message: "UPDATED", updateShoppingCart });
-    }
-  } catch (err) {
-    next(err);
-  }
-};
 
 exports.getShoppingCart = async (req, res, next) => {
   try {
@@ -47,10 +18,45 @@ exports.getShoppingCart = async (req, res, next) => {
     if (foundShoppingCart) {
       return res.status(200).json({ messaage: "get cart", foundShoppingCart });
     } else {
-      return res
-        .status(400)
-        .json({ messaage: "No item in cart", foundShoppingCart });
+      return res.status(400).json({ messaage: "No item in cart" });
     }
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.createShoppingCart = async (req, res, next) => {
+  try {
+    console.log(req.body);
+    const { id, amount } = req.body;
+    const productCart = {
+      userId: req.user.id,
+      productId: +id,
+      amount,
+    };
+    console.log(productCart);
+    const createShoppingCart = await prisma.shoppingCarts.create({
+      data: productCart,
+    });
+    res.status(201).json({ message: "CREATED", createShoppingCart });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.updateShoppingCart = async (req, res, next) => {
+  try {
+    const { productId, amount } = req.body;
+    console.log(productId, "productId");
+    const findProduct = await prisma.shoppingCarts.findFirst({
+      where: { productId },
+    });
+    console.log(findProduct);
+    const updateShoppingCart = await prisma.shoppingCarts.update({
+      where: { id: findProduct.id },
+      data: { amount: +amount },
+    });
+    res.status(200).json({ message: "UPDATED", updateShoppingCart });
   } catch (err) {
     next(err);
   }
