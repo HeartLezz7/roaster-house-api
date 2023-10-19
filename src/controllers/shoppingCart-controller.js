@@ -73,3 +73,15 @@ exports.deleteShoppingCart = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.CheckOutShoppingCart = async (req, res, next) => {
+  try {
+    const shoppingCart = await prisma.shoppingCarts.findMany({
+      where: { userId: req.user.id },
+    });
+    console.log(shoppingCart);
+    res.status(201).json({ message: "get cart", shoppingCart: shoppingCart });
+  } catch (err) {
+    next(err);
+  }
+};

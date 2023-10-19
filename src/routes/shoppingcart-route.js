@@ -26,5 +26,10 @@ router.delete(
   authenticateMiddleware,
   shoppingCartController.deleteShoppingCart
 );
+router.get(
+  "/checkout",
+  authenticateMiddleware,
+  shoppingCartController.CheckOutShoppingCart
+);
 
 module.exports = router;
