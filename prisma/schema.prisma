@@ -103,7 +103,7 @@ model Order {
   id          Int          @id @default(autoincrement())
   sumPrice    Decimal      @db.Decimal(10, 2)
   createdAt   DateTime     @default(now())
-  status      orderStatus
+  status      orderStatus  @default(pending)
   userId      Int
   user        User         @relation(fields: [userId], references: [id])
   orderItem   OrderItem[]

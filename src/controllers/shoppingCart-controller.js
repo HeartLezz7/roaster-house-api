@@ -9,6 +9,7 @@ exports.getShoppingCart = async (req, res, next) => {
         product: {
           select: {
             productName: true,
+            productImage: true,
             price: true,
             roastLevel: true,
           },
