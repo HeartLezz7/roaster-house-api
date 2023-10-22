@@ -6,6 +6,7 @@ const {
   loginSchema,
   adminLoginSchema,
   adminRegisterSchema,
+  updateProfileSchema,
 } = require("../validators/auth-validator");
 
 const validator = require("../validators/validate-shcema");
@@ -49,6 +50,19 @@ exports.login = async (req, res, next) => {
     delete user.password;
 
     res.json({ message: "login SUCCESS", user, accessToken });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.updateProfile = async (req, res, next) => {
+  try {
+    const value = validator(updateProfileSchema, req.body, 400);
+    const updateProfile = await prisma.user.update({
+      where: { id: +req.user.id },
+      data: value,
+    });
+    res.status(201).json({ message: "Update profile SUCCESS", updateProfile });
   } catch (err) {
     next(err);
   }

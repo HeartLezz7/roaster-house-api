@@ -1,7 +1,6 @@
 const prisma = require("../models/prisma");
 const fs = require("fs/promises");
 const upload = require("../utils/cloudinary-service");
-const { url } = require("inspector");
 
 exports.addProduct = async (req, res, next) => {
   try {

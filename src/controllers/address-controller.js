@@ -5,10 +5,20 @@ const validator = require("../validators/validate-shcema");
 
 exports.createAddress = async (req, res, next) => {
   try {
+    const foundUser = await prisma.address.findFirst({
+      where: { userId: req.user.id },
+    });
     const value = validator(addressValidateSchema, req.body, 400);
-    value.userId = req.user.id;
-    const address = await prisma.address.create({ data: value });
-    res.status(201).json({ message: "Create address SUCCESS", address });
+    if (!foundUser) {
+      value.userId = req.user.id;
+      const address = await prisma.address.create({ data: value });
+      res.status(201).json({ message: "Create address SUCCESS", address });
+    } else {
+      const updateAddress = await prisma.address.update({
+        where: { id: foundUser.id },
+      });
+      res.status(201).json({ message: "Update Address", updateAddress });
+    }
   } catch (err) {
     next(err);
   }

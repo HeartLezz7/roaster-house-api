@@ -52,6 +52,17 @@ const loginSchema = Joi.object({
   }),
 });
 
+const updateProfileSchema = Joi.object({
+  firstName: Joi.string().trim().required(),
+  // .messages({ "string.empty": "first name is required" })
+  lastName: Joi.string().trim().required(),
+  email: Joi.string()
+    .pattern(/@(gmail|hotmail)\.com$/)
+    .trim()
+    .required(),
+  phone: Joi.string().trim().required(),
+});
+
 const adminLoginSchema = Joi.object({
   emailOrUsername: Joi.alternatives([
     Joi.string()
@@ -115,6 +126,7 @@ const adminRegisterSchema = Joi.object({
 module.exports = {
   registerSchema,
   loginSchema,
+  updateProfileSchema,
   adminLoginSchema,
   adminRegisterSchema,
 };

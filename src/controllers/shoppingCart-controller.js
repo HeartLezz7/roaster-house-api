@@ -48,11 +48,9 @@ exports.createShoppingCart = async (req, res, next) => {
 exports.updateShoppingCart = async (req, res, next) => {
   try {
     const { productId, amount } = req.body;
-    console.log(productId, "productId");
     const findProduct = await prisma.shoppingCarts.findFirst({
       where: { productId },
     });
-    console.log(findProduct);
     const updateShoppingCart = await prisma.shoppingCarts.update({
       where: { id: findProduct.id },
       data: { amount: +amount },

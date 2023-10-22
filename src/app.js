@@ -8,6 +8,7 @@ const productRoute = require("../src/routes/product-route");
 const shoppingCartRoute = require("../src/routes/shoppingcart-route");
 const addressRoute = require("../src/routes/address-route");
 const orderRoute = require("../src/routes/order-route");
+const paymentRoute = require("../src/routes/payment-route");
 
 const notFoundMiddleware = require("../src/middlewares/not-found");
 const errorMiddleware = require("../src/middlewares/error");
@@ -20,6 +21,7 @@ app.use("/product", productRoute);
 app.use("/shoppingCart", shoppingCartRoute);
 app.use("/address", addressRoute);
 app.use("/order", orderRoute);
+app.use("/payment", paymentRoute);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);

@@ -1,10 +1,10 @@
 const express = require("express");
-const authenticate = require("../middlewares/authenticate");
+const authenticateMiddleware = require("../middlewares/authenticate");
 const router = express.Router();
 
 const addressController = require("../controllers/address-controller");
 
-router.post("/create", authenticate, addressController.createAddress);
-router.get("/get", authenticate, addressController.getAddress);
+router.post("/create", authenticateMiddleware, addressController.createAddress);
+router.get("/get", authenticateMiddleware, addressController.getAddress);
 
 module.exports = router;
