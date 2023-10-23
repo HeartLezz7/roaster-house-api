@@ -28,14 +28,12 @@ exports.getShoppingCart = async (req, res, next) => {
 
 exports.createShoppingCart = async (req, res, next) => {
   try {
-    console.log(req.body);
     const { id, amount } = req.body;
     const productCart = {
       userId: req.user.id,
       productId: +id,
       amount,
     };
-    console.log(productCart);
     const createShoppingCart = await prisma.shoppingCarts.create({
       data: productCart,
     });
@@ -78,7 +76,6 @@ exports.CheckOutShoppingCart = async (req, res, next) => {
     const shoppingCart = await prisma.shoppingCarts.findMany({
       where: { userId: req.user.id },
     });
-    console.log(shoppingCart);
     res.status(201).json({ message: "get cart", shoppingCart: shoppingCart });
   } catch (err) {
     next(err);

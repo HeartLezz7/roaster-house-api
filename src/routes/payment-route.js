@@ -9,4 +9,10 @@ router.patch(
   paymentController.confirmOrder
 );
 
+router.patch(
+  "/adminConfirm",
+  authenticateMiddleware,
+  paymentController.adminConfirm
+);
+
 module.exports = router;

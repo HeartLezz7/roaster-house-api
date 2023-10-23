@@ -8,7 +8,6 @@ exports.createOrder = async (req, res, next) => {
       where: { userId: req.user.id },
       include: { product: { select: { price: true } } },
     });
-    console.log(getShoppingCart);
     if (!getShoppingCart) {
       return createError("Not found user", 400);
     }
@@ -57,26 +56,45 @@ exports.getOrder = async (req, res, next) => {
     const foundUserOrder = await prisma.order.findMany({
       where: { userId: req.user.id },
     });
-    const foundOrder = foundUserOrder.find((item) => item.id == orderId);
-    if (!foundOrder) {
-      return createError("notfound order", 400);
-    }
-    const getOrder = await prisma.order.findFirst({
-      where: { id: foundOrder.id },
-      include: {
-        orderItem: {
-          include: {
-            product: {
-              select: {
-                id: true,
-                productName: true,
+    if (req.user.role === "user") {
+      const foundOrder = foundUserOrder.find((item) => item.id == orderId);
+      if (!foundOrder) {
+        return createError("notfound order", 400);
+      }
+      const getOrder = await prisma.order.findFirst({
+        where: { id: foundOrder.id },
+        include: {
+          orderItem: {
+            include: {
+              product: {
+                select: {
+                  id: true,
+                  productName: true,
+                },
               },
             },
           },
         },
-      },
-    });
-    res.status(200).json({ message: "Get Order", getOrder });
+      });
+      return res.status(200).json({ message: "Get Order", getOrder });
+    } else if (req.user.role === "admin") {
+      const getOrder = await prisma.order.findFirst({
+        where: { id: +orderId },
+        include: {
+          orderItem: {
+            include: {
+              product: {
+                select: {
+                  id: true,
+                  productName: true,
+                },
+              },
+            },
+          },
+        },
+      });
+      return res.status(200).json({ message: "Admin Get Order", getOrder });
+    }
   } catch (err) {
     next(err);
   }
@@ -84,10 +102,21 @@ exports.getOrder = async (req, res, next) => {
 
 exports.getAllOrder = async (req, res, next) => {
   try {
-    const getAllOrder = await prisma.order.findMany({
-      where: { userId: +req.user.id },
-    });
-    if (getAllOrder) {
+    if (req.user.role === "user") {
+      const getAllOrder = await prisma.order.findMany({
+        where: { userId: +req.user.id },
+      });
+      return res.status(200).json({ getAllOrder });
+    } else if (req.user.role === "admin") {
+      const getAllOrder = await prisma.order.findMany({
+        include: {
+          transaction: {
+            select: {
+              payment: true,
+            },
+          },
+        },
+      });
       return res.status(200).json({ getAllOrder });
     } else {
       return createError("not found order", 400);
@@ -103,7 +132,6 @@ exports.checkoutOrder = async (req, res, next) => {
       where: { userId: req.user.id },
     });
     const foundOrder = foundUser.find((item) => item.id === +req.body.id);
-    console.log(foundOrder, "fo");
     if (!foundOrder) {
       return createError("not found order", 400);
     }
@@ -118,15 +146,12 @@ exports.checkoutOrder = async (req, res, next) => {
 
 exports.paidOrder = async (req, res, next) => {
   try {
-    console.log(req.file, "file");
     const foundOrderUser = await prisma.order.findMany({
       where: { userId: req.user.id },
     });
 
     const { paymentId } = req.params;
     const foundOrder = foundOrderUser.find((item) => item.id == +paymentId);
-
-    console.log(foundOrder, "order");
 
     const foundtransaction = await prisma.transaction.findFirst({
       where: { orderId: foundOrder.id },

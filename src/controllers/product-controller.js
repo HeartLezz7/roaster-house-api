@@ -5,7 +5,6 @@ const upload = require("../utils/cloudinary-service");
 exports.addProduct = async (req, res, next) => {
   try {
     req.body.size = +req.body.size;
-    req.body.amount = +req.body.amount;
 
     if (req.file) {
       const url = await upload(req.file.path);

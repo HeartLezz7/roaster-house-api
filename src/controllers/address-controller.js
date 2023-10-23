@@ -26,15 +26,25 @@ exports.createAddress = async (req, res, next) => {
 
 exports.getAddress = async (req, res, next) => {
   try {
-    if (!req.user) {
-      return createError("user not found", 400);
+    if (req.user.role == "user") {
+      const address = await prisma.address.findFirst({
+        where: { userId: req.user.id },
+      });
+      return res
+        .status(200)
+        .json({ message: "Get address", address, userId: req.user.id });
+    } else if (req.user.role == "admin") {
+      return res
+        .status(200)
+        .json({ message: "hello admin", userId: req.user.id });
+    } else {
+      return res
+        .status(200)
+        .json({ message: "hello admin", address: {}, userId: req.user.id });
     }
-    const address = await prisma.address.findFirst({
-      where: { userId: req.user.id },
-    });
-    res
-      .status(200)
-      .json({ message: "Get address", address, userId: req.user.id });
+    // if (!req.user) {
+    //   return createError("user not found", 400);
+    // }
   } catch (err) {
     next(err);
   }
