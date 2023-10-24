@@ -12,11 +12,6 @@ exports.addProduct = async (req, res, next) => {
         productImage: url,
       });
       const product = await prisma.product.create({ data: productObject });
-      // UPDATE product
-      // const product = await prisma.product.update({
-      //   data: { productImage: url },
-      //   where: { id: 4 },
-      // });
       res.status(201).json({ message: "add complete", product });
     }
   } catch (err) {
@@ -44,6 +39,39 @@ exports.findProduct = async (req, res, next) => {
       where: { id: +productId },
     });
     res.status(200).json({ product });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deleteProduct = async (req, res, next) => {
+  try {
+    const { productId } = req.params;
+    await prisma.product.delete({
+      where: {
+        id: +productId,
+      },
+    });
+    res.status(200).status({ message: "DELETED" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.updateProduct = async (req, res, next) => {
+  try {
+    if (req.file) {
+      const url = await upload(req.file.path);
+
+      const { productId } = req.params;
+      req.body.size = +req.body.size;
+      req.body.productImage = url;
+      const updatedProduct = await prisma.product.update({
+        data: req.body,
+        where: { id: +productId },
+      });
+      res.status(201).json({ message: "Updated", updatedProduct });
+    }
   } catch (err) {
     next(err);
   }
