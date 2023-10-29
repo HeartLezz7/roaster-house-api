@@ -52,7 +52,8 @@ exports.deleteProduct = async (req, res, next) => {
         id: +productId,
       },
     });
-    res.status(200).status({ message: "DELETED" });
+
+    res.status(200).json({ message: "DELETED" });
   } catch (err) {
     next(err);
   }
@@ -74,5 +75,9 @@ exports.updateProduct = async (req, res, next) => {
     }
   } catch (err) {
     next(err);
+  } finally {
+    if (req.file) {
+      fs.unlink(req.file.path);
+    }
   }
 };
